@@ -1,0 +1,172 @@
+<head>
+	<link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+		<link rel="stylesheet" href="https://vs.t1ch.com/themes/odometer-theme-default.css">
+	<script src="odometer.min.js"></script>
+<style type="text/css">
+	#hud{
+		text-align: center;
+		font-family: 'Open Sans', sans-serif;
+	}
+
+	.card{
+		display: inline-block;
+		padding: 20px;
+		/*width:fit-content;*/
+		margin:2px 10px;
+		border:1px solid #eee;
+		background: #fff;
+
+	}
+	.title>.p,.title>.t{
+		font-size:30px;
+		display: block;
+		color:#dd0000;
+	}
+	.subs{
+		display: block;
+		font-size:80px;
+		font-weight: bold;
+		font-family: 'Open Sans', sans-serif;
+	}
+	#desc{
+		text-align: center;
+		font-size:30px;
+		padding-top: 40px;
+		font-family: 'Open Sans', sans-serif;
+
+	}
+	.t{
+		font-weight: bold;
+	}
+
+	.p{
+		font-weight: bold;
+	}
+	.container{
+		padding: 0px 0;
+		position: absolute;
+		/*top:50px;*/
+		width:100%;
+	}
+	#chart-looser{
+		 height: 150px;
+		 width:60%;
+		 margin:20px auto;
+	}
+	#chart{
+		 height: 150px;
+		 width:60%;
+		 margin:20px auto;
+	}
+	
+	.jumbotron{
+		padding: 100px 0 20px;
+		background: #dd0000;
+	}
+	body{
+		padding:0;
+		margin:0;
+	}
+</style>
+</head>
+<body>
+	<div class="container">
+		<div class="jumbotron">
+			<div id="hud">
+					<div class='cards'>
+						<div class='card'>
+							<span id='title-leader'>Leader</span>
+							<span class='odometer' id='leader-numbers'>0</span></div>
+						</div>
+						<div class='card'>
+							<span id='title-looser'>Looser</span>
+							<span class='odometer' id='looser-numbers'>0</span>
+						</div>
+					</div>
+		</div>
+		<div id="chart"></div>
+		
+		<div id="chart-leader"></div>
+		<div id="chart-looser"></div>
+		<div id="desc"></div>
+		
+	</div>
+</body>
+<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+	<script type="text/javascript">
+	let getSubCount = async (username,callback) =>{
+		let key = '';
+		url = `api/GetUser.php?cid=${username}`;
+		let res = await fetch(url);
+		let data = await res.json();
+		return parseInt(data.followers);
+	}
+let subgap = [];
+let subsleader = [];
+let subslooser = [];
+var chart = new CanvasJS.Chart("chart", {
+	title :{
+		text: "Subscribers Gap"
+	},
+	axisY: {
+		includeZero: false
+	},      
+	data: [{
+		type: "line",
+		dataPoints: subgap
+	}]
+});
+
+var chartLooser = new CanvasJS.Chart("chart-looser", {
+	title :{
+		text: "Subscribers"
+	},
+	axisY: {
+		includeZero: false
+	},      
+	data: [{
+		type: "line",
+		dataPoints: subsleader
+	},
+	{
+		type: "line",
+		dataPoints: subslooser
+	}]
+});
+
+window.odometerOptions = {
+  auto: true, // Don't automatically initialize everything with class 'odometer'.
+};
+
+
+let main = async ()=>{
+	let pewds = await getSubCount('UCzMjRlKVO9XIqH_crIFpi6w');
+	let tseries = await getSubCount('UC0lkCn7D--uMrtwAXRj_cdw');
+	let diff = Math.abs(pewds-tseries);
+	let leader = pewds > tseries?{id:"<span class='p'>Skeppy</span>",subs:pewds}:{id:"<span class='t'>BadBoyHalo</span>",subs:tseries};
+	let looser = pewds < tseries?{id:"<span class='p'>Skeppy</span>",subs:pewds}:{id:"<span class='t'>BadBoyHalo</span>",subs:tseries};
+	;
+	document.getElementById('title-leader').innerHTML = leader.id;
+	document.getElementById('leader-numbers').innerHTML = leader.subs;
+	document.getElementById('title-looser').innerHTML = looser.id;
+	document.getElementById('looser-numbers').innerHTML = looser.subs;
+	console.log(`${leader.id} is ahead of ${looser.id} by ${diff.toLocaleString()} subscribers.`);
+	console.log(`${leader.id}: ${leader.subs.toLocaleString()}`);
+	console.log(`${looser.id}: ${looser.subs.toLocaleString()}`);
+	document.getElementById('desc').innerHTML = `${leader.id} is ahead of ${looser.id} by ${diff.toLocaleString()} subscribers.`;
+	subgap.push({y:diff,x:new Date()});
+	subsleader.push({y:pewds,x:new Date()});
+	subslooser.push({y:tseries,x:new Date()});
+	console.log(subgap);
+	chart.render();
+	chartLooser.render()
+	document.getElementsByClassName('canvasjs-chart-credit')[0].style.display="none";
+}
+
+
+
+
+
+setInterval(main,1000);
+// main();
+</script>

